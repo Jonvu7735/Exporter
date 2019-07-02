@@ -46,7 +46,7 @@ function update_source() {
 	sudo cp -R $SDIR/sbin $BINARYPATH
 	sudo cp -R $SDIR/services $SVPATH
 	sudo cp $SDIR/var/exporter_merge.yml $CNFPATH
-	sudo chmod +x $BINARYPATH
+	sudo chmod +x $BINARYPATH -R
 }
 # Funtion Start/Stop/Restart
 function stop_exporter() {
