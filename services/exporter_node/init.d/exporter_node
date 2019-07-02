@@ -2,9 +2,10 @@
 
 RETVAL=0
 PROG="exporter_node"
-EXEC="/etc/prometheus/sbin/exporter_node --web.listen-address=:11020"
+EXEC="/etc/prometheus/sbin/exporter_node "
+PID="/tmp/$PROG.pid"
 LOCKFILE="/var/lock/subsys/$PROG"
-
+OPTIONS="--web.listen-address=:11020"
 # Source function library.
 if [ -f /etc/rc.d/init.d/functions ]; then
   . /etc/rc.d/init.d/functions
@@ -29,7 +30,7 @@ start() {
 
 stop() {
   echo -n "Stopping $PROG: "
-  killproc $EXEC
+  killproc $PID
   RETVAL=$?
   [ $RETVAL -eq 0 ] && rm -r $LOCKFILE && success || failure
   echo

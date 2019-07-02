@@ -66,14 +66,14 @@ function stop_exporter() {
 	fi
 }
 function start_exporter() {
-	ps=`ps aux | grep -v grep | grep -v rsync | grep "${prog}" | awk 'BEGIN{FS="/exporter_"}{print $2}' | awk '{print $1}'`
-    
+	#ps=`ps aux | grep -v grep | grep -v rsync | grep "${prog}" | awk 'BEGIN{FS="/exporter_"}{print $2}' | awk '{print $1}'`
+        ps="${prog}"
 	echo -n $"Starting $prog: "
-	   if [[ $ps == merge ]]; then
-		bash -c "$BINARYPATH/${prog} -c $CNFPATH/${prog}.yaml --listen-port $merge_port >> $LOGPATH/exporter_merge_$DTIME.log 2>&1"
+	   if [[ $ps == exporter_merge ]]; then
+		bash -c "${BINARYPATH}/${prog} -c ${CNFPATH}/${prog}.yaml --listen-port $merge_port >> $LOGPATH/exporter_merge_$DTIME.log 2>&1 &"
 		echo -e $success
-	   elif [[ $ps == node ]]; then
-		bash -c "$BINARYPATH/${prog} --web.listen-address=:${node_port} >> $LOGPATH/exporter_node_$DTIME.log 2>&1"
+	   elif [[ $ps == exporter_node ]]; then
+		bash -c "${BINARYPATH}/${prog} --web.listen-address=:${node_port} >> $LOGPATH/exporter_node_$DTIME.log 2>&1 &"
 		echo -e $success
 	fi
 }
@@ -84,8 +84,10 @@ function init_file() {
 		[ ! -f "/etc/init.d/exporter_merge" ] && sudo cp $SVPATH/exporter_merge/init.d/exporter_merge /etc/init.d/
 		[ ! -f "/etc/init.d/exporter_node" ] && sudo cp $SVPATH/exporter_node/init.d/exporter_node /etc/init.d/
 		sudo chmod +x /etc/init.d/exporter_*
-		sudo chkconfig enable exporter_merge
-		sudo chkconfig enable exporter_node
+		chkconfig --add exporter_merge >/dev/null 2>&1 
+		chkconfig on exporter_merge >/dev/null 2>&1 
+		chkconfig --add exporter_node >/dev/null 2>&1
+		chkconfig on exporter_node >/dev/null 2>&1
 	elif [[ $os == 7 ]]; then
 		[ ! -f "/etc/systemd/system/exporter_merge.service" ] && sudo cp $SVPATH/exporter_merge/systemd/exporter_merge.service /etc/systemd/system/
 		[ ! -f "/etc/systemd/system/exporter_node.service" ] && sudo cp $SVPATH/exporter_node/systemd/exporter_node.service /etc/systemd/system/
@@ -103,6 +105,7 @@ for prog in "${arr_path_1[@]}"
         do
                 stop_exporter
         done
+
 # Step 2: Base Check
 check_homepath
 check_user
@@ -115,5 +118,6 @@ for prog in "${arr_path_2[@]}"
 	do 
 		start_exporter
 	done
+echo -n ""
 #END
 echo "Install successful."
