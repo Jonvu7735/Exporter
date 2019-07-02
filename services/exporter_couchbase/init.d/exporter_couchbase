@@ -3,8 +3,9 @@
 RETVAL=0
 PROG="exporter_couchbase"
 EXEC="/etc/prometheus/sbin/exporter_couchbase"
+PID="/tmp/$PROG.pid"
 LOCKFILE="/var/lock/subsys/$PROG"
-OPTIONS="config.file=/etc/prometheus/var/couchbase/exporter_couchbase.yml"
+OPTIONS="/etc/prometheus/var/exporter_couchbase.yaml"
 
 # Source function library.
 if [ -f /etc/rc.d/init.d/functions ]; then
@@ -30,7 +31,7 @@ start() {
 
 stop() {
   echo -n "Stopping $PROG: "
-  killproc $EXEC
+  killproc $PID
   RETVAL=$?
   [ $RETVAL -eq 0 ] && rm -r $LOCKFILE && success || failure
   echo
