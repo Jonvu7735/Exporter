@@ -5,7 +5,7 @@ After=network-online.target
 [Service]
 Type=simple
 User=prometheus
-ExecStart=/etc/prometheus/sbin/exporter_node --web.listen-address=:11020
+ExecStart=/etc/prometheus/sbin/exporter_node config.file=/etc/prometheus/var/couchbase/exporter_couchbase.yaml
 Restart=on-failure
 
 

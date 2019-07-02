@@ -1,7 +1,7 @@
 ---
   
 web:
-  listenAddress: :11025
+  listenAddress: :11022
   telemetryPath: /metrics
   timeout: 10s
 
