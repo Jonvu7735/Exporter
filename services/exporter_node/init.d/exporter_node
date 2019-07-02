@@ -2,9 +2,8 @@
 
 RETVAL=0
 PROG="exporter_node"
-EXEC="/etc/prometheus/sbin/exporter_node"
+EXEC="/etc/prometheus/sbin/exporter_node --web.listen-address=:11020"
 LOCKFILE="/var/lock/subsys/$PROG"
-OPTIONS="--web.listen-address=:11020"
 
 # Source function library.
 if [ -f /etc/rc.d/init.d/functions ]; then

@@ -2,9 +2,8 @@
 
 RETVAL=0
 PROG="exporter_node"
-EXEC="/etc/prometheus/sbin/exporter_merge"
+EXEC="/etc/prometheus/sbin/exporter_merge --config.file=/etc/prometheus/var/exporter_merge.yaml --listen-port 11011"
 LOCKFILE="/var/lock/subsys/$PROG"
-OPTIONS="--web.listen-address=:11011"
 
 # Source function library.
 if [ -f /etc/rc.d/init.d/functions ]; then
