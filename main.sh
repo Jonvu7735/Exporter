@@ -19,6 +19,7 @@ CNFPATH=${HOMEPATH}/var
 SVPATH=${HOMEPATH}/services
 DLog="${LOGPATH}/deploy_$IP_$DTIME.log"
 merge_port="11011"
+node_port="11020"
 ########################################################################################################################################################
 # Check WorkDIR
 function check_homepath() {
@@ -48,57 +49,64 @@ function update_source() {
 	sudo chmod +x $BINARYPATH
 }
 # Funtion Start/Stop/Restart
-function stop() {
+function stop_exporter() {
 	ps=`ps aux | grep -v grep | grep -v rsync | grep "${prog}"`
 	c=`ps aux | grep -v grep | grep -v rsync | grep "${prog}" | wc -l`
 
 	echo -n $"Stopping $prog: "
 	if [ $c -gt 0 ]; then
 		pids=`echo "$ps" | sed 's/  \+/ /g' | cut -d' ' -f2`
-		kill -9 $pids
+		kill -9 $pids 
 		echo -e $success
 	fi
 }
-function start() {
-	ps=`ps aux | grep -v grep | grep -v rsync | grep "${prog}"`
-	c=`ps aux | grep -v grep | grep -v rsync | grep "${prog}" | wc -l`
+function start_exporter() {
+	ps=`ps aux | grep -v grep | grep -v rsync | grep "${prog}" | awk 'BEGIN{FS="/exporter_"}{print $2}' | awk '{print $1}'`
 
 	echo -n $"Starting $prog: "
-	if [ $c -eq 0 ]; then
-		else -c $BINARYPATH/exporter_merge -c $CNFPATH/exporter_merge.yml --listen-port $merge_port >> $LOGPATH/exporter_merge_$DTIME.log 2>&1
+	if [[ $ps == merge ]]; then
+		bash -c "$BINARYPATH/${prog} -c $CNFPATH/${prog}.yml --listen-port $merge_port >> $LOGPATH/exporter_merge_$DTIME.log 2>&1"
+		elif [[ $ps == node ]]; then
+		bash -c "$BINARYPATH/${prog} --web.listen-address=:${node_port}"
 		echo -e $success
 	fi
 }
-function restart() {
-	stop	#1
-	start	#2
+
+function init_file() {
+    cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'
+	if [ $? -eq 6 ]; then
+		echo "OS is CentOS 6"
+		[ ! -f "${/etc/init.d/exporter_merge}" ] && sudo cp $SVPATH/exporter_merge/init.d/exporter_merge /etc/init.d/
+		[ ! -f "${/etc/init.d/exporter_node}" ] && sudo cp $SVPATH/exporter_node/init.d/exporter_node /etc/init.d/
+		sudo chmod +x /etc/init.d/exporter_*
+		sudo chkconfig enable exporter_merge
+		sudo chkconfig enable exporter_node
+	elif [ $? -eq 7 ]; then
+		echo "OS is CentOS 7"
+		[ ! -f "${/etc/systemd/system/exporter_merge.service}" ] && sudo cp $SVPATH/exporter_merge/systemd/exporter_merge.service /etc/systemd/system/
+		[ ! -f "${/etc/systemd/system/exporter_node.service}" ] && sudo cp $SVPATH/exporter_node/systemd/exporter_node.service /etc/systemd/system/
+		sudo chmod +x /etc/systemd/system/exporter_*.service
+		sudo systemctl daemon-reload
+		sudo systemctl enable exporter_merge.service
+		sudo systemctl enable exporter_node.service
+    else
+       echo "Can not detect OS"
+    fi
 }
 
-# Function exporter services
-function exporter_node() {
-	ps=`ps aux | grep -v grep | grep -v rsync | grep exporter_node"`
-	c=`ps aux | grep -v grep | grep -v rsync | grep exporter_node | wc -l`
-	
-	if [ $c -gt 0 ]; then
-		pids=`echo "$ps" | sed 's/  \+/ /g' | cut -d' ' -f2`
-		kill -9 $pids >> $LOGPATH/exporter_node_$DTIME.log 2>&1
-		$BINARYPATH/exporter_node --web.listen-address=:11020 >> $LOGPATH/exporter_node_$DTIME.log 2>&1
-		echo -e $success
-	fi
-	
-} 
-
-########################################################################################################################################################
 # Step 1: Base Check
-check_homepath()
-check_user()
-update_source()
+check_homepath
+check_user
+update_source
+init_file
 echo -e $success
-# Step 3 : Start Exporter_Node
+# Step 2: Start Exporter_Merge & Node
 echo - e "Starting Node_Exporter"
-exporter_node()
-### Restart Exporter_Merge
-stop()
-start()
+arr_path=("exporter_merge" "exporter_node")
+for prog in "@{arr_path}"
+	do 
+		stop_exporter
+		start_exporter
+	done
 #END
 echo "Install successful."
