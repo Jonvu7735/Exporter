@@ -8,8 +8,7 @@ success="[$Gre OK $RCol]"
 fail="[$Red Fail $RCol]"
 ########################################################################################################################################################
 # Declare Variables
-IP=$(/sbin/ip add | egrep '10\.|172\.' | egrep 'brd 10\.|brd 172\.' | tr -s ' ' | awk 'BEGIN{FS="inet "}{print $2}' | awk 'BEGIN{FS="/[[:digit:]]+"}{print $1}' | head -n 1)
-DTIME=$(date +"%Y-%m-%d")
+DTIME=$(date +"%Y%m%d")
 SDIR=`pwd`
 HOMEPATH="/etc/prometheus"
 USER='prometheus'
