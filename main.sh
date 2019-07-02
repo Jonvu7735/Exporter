@@ -35,17 +35,15 @@ function check_user() {
     	if [ $? -eq 0 ]; then
 	   	sudo chown -R $USER:$USER $HOMEPATH
     	else
-       		echo "Create User Prometheus"
        		sudo useradd --no-create-home --shell /sbin/nologin ${USER}
-	   	sudo chown -R $USER:$USER $HOMEPATH
+	   		sudo chown -R $USER:$USER $HOMEPATH
     	fi
 }
 # Log File
 function check_log() {
 	[ ! -f "$LOGPATH/exporter_merge_${DTIME}.log" ] && touch $LOGPATH/exporter_merge_${DTIME}.log
-        [ ! -f "$LOGPATH/exporter_node_${DTIME}.log" ] && touch $LOGPATH/exporter_node_${DTIME}.log
-	sudo chown -R $USER: $LOGPATH
-}
+	[ ! -f "$LOGPATH/exporter_node_${DTIME}.log" ] && touch $LOGPATH/exporter_node_${DTIME}.log
+	sudo chown -R $USER
 # Update 
 function update_source() {
 	sudo cp -R $SDIR/sbin $HOMEPATH
@@ -62,22 +60,20 @@ function stop_exporter() {
 	if [ $c -gt 0 ]; then
 		pids=`echo "$ps" | sed 's/  \+/ /g' | cut -d' ' -f2`
 		kill -9 $pids 
-		echo -e $success
+		echo -e $success.
 	fi
 }
 function start_exporter() {
 	#ps=`ps aux | grep -v grep | grep -v rsync | grep "${prog}" | awk 'BEGIN{FS="/exporter_"}{print $2}' | awk '{print $1}'`
-        ps="${prog}"
-	echo -n $"Starting $prog: "
+    ps="${prog}"
 	   if [[ $ps == exporter_merge ]]; then
 		bash -c "${BINARYPATH}/${prog} -c ${CNFPATH}/${prog}.yaml --listen-port $merge_port >> $LOGPATH/exporter_merge_$DTIME.log 2>&1 &"
-		echo -e $success
+		echo -e $success.
 	   elif [[ $ps == exporter_node ]]; then
 		bash -c "${BINARYPATH}/${prog} --web.listen-address=:${node_port} >> $LOGPATH/exporter_node_$DTIME.log 2>&1 &"
-		echo -e $success
+		echo -e $success.
 	fi
 }
-
 function init_file() {
         os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
 	if [[ $os == 6 ]]; then
@@ -102,10 +98,10 @@ function init_file() {
 # Step 1: Stop service
 arr_path_1=("exporter_merge" "exporter_node")
 for prog in "${arr_path_1[@]}"
-        do
-                stop_exporter
-        done
-
+    do
+         stop_exporter
+    done
+echo -n ""
 # Step 2: Base Check
 check_homepath
 check_user
