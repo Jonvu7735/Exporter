@@ -70,7 +70,7 @@ function start_exporter() {
     
 	echo -n $"Starting $prog: "
 	   if [[ $ps == merge ]]; then
-		bash -c "$BINARYPATH/${prog} -c $CNFPATH/${prog}.yml --listen-port $merge_port >> $LOGPATH/exporter_merge_$DTIME.log 2>&1"
+		bash -c "$BINARYPATH/${prog} -c $CNFPATH/${prog}.yaml --listen-port $merge_port >> $LOGPATH/exporter_merge_$DTIME.log 2>&1"
 		echo -e $success
 	   elif [[ $ps == node ]]; then
 		bash -c "$BINARYPATH/${prog} --web.listen-address=:${node_port} >> $LOGPATH/exporter_node_$DTIME.log 2>&1"
