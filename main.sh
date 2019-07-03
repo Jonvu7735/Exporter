@@ -113,6 +113,5 @@ for prog in "${arr_path_2[@]}"
 	do 
 		start_exporter
 	done
-echo -n ""
+echo "Install successful"
 #END
-echo "Install successful."
