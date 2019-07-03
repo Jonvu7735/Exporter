@@ -115,4 +115,4 @@ for prog in "${arr_path_2[@]}"
 	done
 echo -n ""
 #END
-echo "Install successful."
+echo "Install successful"
