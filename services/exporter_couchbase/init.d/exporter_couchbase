@@ -5,7 +5,7 @@ PROG="exporter_couchbase"
 EXEC="/etc/prometheus/sbin/exporter_couchbase"
 PID="/tmp/$PROG.pid"
 LOCKFILE="/var/lock/subsys/$PROG"
-OPTIONS="config.file=/etc/prometheus/var/exporter_couchbase.yml"
+OPTIONS=""
 
 # Source function library.
 if [ -f /etc/rc.d/init.d/functions ]; then

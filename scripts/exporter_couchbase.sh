@@ -32,12 +32,12 @@ function start_exporter() {
 	ps=`ps aux | grep -v grep | grep -v rsync | grep "${exp_name}"`
     c=`ps aux | grep -v grep | grep -v rsync | grep "${exp_name}" | wc -l`
 	if [ $c -gt 0 ]]; then
-        $BINARYPATH/$exp_name --config.file=$CNFPATH/${exp_name}.yml >> $LOGPATH/${exp_name}_${DTIME}.log &
+        $BINARYPATH/${exp_name} --config.file=$CNFPATH/${exp_name}.yml >> $LOGPATH/${exp_name}_${DTIME}.log &
         echo -e $success
 	fi
 }
 function init_file() {
-        os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
+    os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
 	if [[ $os == 6 ]]; then
 		[ ! -f "/etc/init.d/${exp_name}" ] && sudo cp $SVPATH/${exp_name}/init.d/${exp_name} /etc/init.d/
 
@@ -55,12 +55,17 @@ function init_file() {
        echo "Can not detect OS"
     fi
 }
+function ln_file() {
+	ln -s $CNFPATH/$exp_name.yml $BINARYPATH/config.yml
+}
 
 # Step 1
-stop_exporter
+
 # Step 2
 check_log
 init_file
+ln_file
 # Step 3
+stop_exporter
 start_exporter
 # END

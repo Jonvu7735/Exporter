@@ -5,7 +5,7 @@ After=network-online.target
 [Service]
 Type=simple
 User=prometheus
-ExecStart=/etc/prometheus/sbin/exporter_couchbase config.file=/etc/prometheus/var/exporter_couchbase.yml
+ExecStart=/etc/prometheus/sbin/exporter_couchbase 
 ExecStop    = kill -INT $MAINPID
 ExecReload  = kill -TERM $MAINPID
 Restart=on-failure
