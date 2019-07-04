@@ -18,10 +18,10 @@ function check_log() {
 	sudo chown -R $USER: $LOGPATH
 }
 function stop_exporter() {
-	ps=`ps aux | grep -v grep | grep -v rsync | grep "${prog}"`
-	c=`ps aux | grep -v grep | grep -v rsync | grep "${prog}" | wc -l`
+	ps=`ps aux | grep -v grep | grep -v rsync | grep "${exp_name}"`
+	c=`ps aux | grep -v grep | grep -v rsync | grep "${exp_name}" | wc -l`
 
-	echo -n $"Stopping $prog: "
+	echo -n $"Stopping $exp_name: "
 	if [ $c -gt 0 ]; then
 		pids=`echo "$ps" | sed 's/  \+/ /g' | cut -d' ' -f2`
 		kill -9 $pids 
@@ -29,8 +29,8 @@ function stop_exporter() {
 	fi
 }
 function start_exporter() {
-	ps=`ps aux | grep -v grep | grep -v rsync | grep "${prog}"`
-    c=`ps aux | grep -v grep | grep -v rsync | grep "${prog}" | wc -l`
+	ps=`ps aux | grep -v grep | grep -v rsync | grep "${exp_name}"`
+    c=`ps aux | grep -v grep | grep -v rsync | grep "${exp_name}" | wc -l`
 	if [ $c -gt 0 ]]; then
         $BINARYPATH/$exp_name --config.file=$CNFPATH/${exp_name}.yml >> $LOGPATH/${exp_name}_${DTIME}.log &
         echo -e $success
