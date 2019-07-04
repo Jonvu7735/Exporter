@@ -59,7 +59,7 @@ function stop_exporter() {
 	echo -n $"Stopping $prog: "
 	if [ $c -gt 0 ]; then
 		pids=`echo "$ps" | sed 's/  \+/ /g' | cut -d' ' -f2`
-		kill -9 $pids 
+		sudo kill -9 $pids 
 		echo -e $success
 	fi
 }
@@ -80,10 +80,10 @@ function init_file() {
 		[ ! -f "/etc/init.d/exporter_merge" ] && sudo cp $SVPATH/exporter_merge/init.d/exporter_merge /etc/init.d/
 		[ ! -f "/etc/init.d/exporter_node" ] && sudo cp $SVPATH/exporter_node/init.d/exporter_node /etc/init.d/
 		sudo chmod +x /etc/init.d/exporter_*
-		chkconfig --add exporter_merge >/dev/null 2>&1 
-		chkconfig on exporter_merge >/dev/null 2>&1 
-		chkconfig --add exporter_node >/dev/null 2>&1
-		chkconfig on exporter_node >/dev/null 2>&1
+		sudo chkconfig --add exporter_merge >/dev/null 2>&1 
+		sudo chkconfig on exporter_merge >/dev/null 2>&1 
+		sudo chkconfig --add exporter_node >/dev/null 2>&1
+		sudo chkconfig on exporter_node >/dev/null 2>&1
 	elif [[ $os == 7 ]]; then
 		[ ! -f "/etc/systemd/system/exporter_merge.service" ] && sudo cp $SVPATH/exporter_merge/systemd/exporter_merge.service /etc/systemd/system/
 		[ ! -f "/etc/systemd/system/exporter_node.service" ] && sudo cp $SVPATH/exporter_node/systemd/exporter_node.service /etc/systemd/system/
