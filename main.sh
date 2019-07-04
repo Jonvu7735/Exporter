@@ -59,7 +59,7 @@ function stop_exporter() {
 	if [ $c -gt 0 ]; then
 		pids=`echo "$ps" | sed 's/  \+/ /g' | cut -d' ' -f2`
 		kill -9 $pids 
-		echo -e $success.
+		echo -e $success
 	fi
 }
 function start_exporter() {
@@ -70,7 +70,7 @@ function start_exporter() {
 		echo -e $success.
 	   elif [[ $ps == exporter_node ]]; then
 		bash -c "${BINARYPATH}/${prog} --web.listen-address=:${node_port} >> $LOGPATH/exporter_node_$DTIME.log 2>&1 &"
-		echo -e $success.
+		echo -e $success
 	fi
 }
 function init_file() {
