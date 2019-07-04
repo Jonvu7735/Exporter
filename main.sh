@@ -42,7 +42,8 @@ function check_user() {
 function check_log() {
 	[ ! -f "$LOGPATH/exporter_merge_${DTIME}.log" ] && touch $LOGPATH/exporter_merge_${DTIME}.log
 	[ ! -f "$LOGPATH/exporter_node_${DTIME}.log" ] && touch $LOGPATH/exporter_node_${DTIME}.log
-	sudo chown -R $USER $LOGPATH
+	sudo chown -R $USER $LOGPATH 
+}
 # Update 
 function update_source() {
 	sudo cp -R $SDIR/sbin $HOMEPATH
@@ -59,7 +60,7 @@ function stop_exporter() {
 	if [ $c -gt 0 ]; then
 		pids=`echo "$ps" | sed 's/  \+/ /g' | cut -d' ' -f2`
 		kill -9 $pids 
-		echo -e $success.
+		echo -e $success
 	fi
 }
 function start_exporter() {
@@ -70,7 +71,7 @@ function start_exporter() {
 		echo -e $success.
 	   elif [[ $ps == exporter_node ]]; then
 		bash -c "${BINARYPATH}/${prog} --web.listen-address=:${node_port} >> $LOGPATH/exporter_node_$DTIME.log 2>&1 &"
-		echo -e $success.
+		echo -e $success
 	fi
 }
 function init_file() {
@@ -113,6 +114,5 @@ for prog in "${arr_path_2[@]}"
 	do 
 		start_exporter
 	done
-echo -n ""
-#END
 echo "Install successful"
+#END
