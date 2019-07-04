@@ -42,7 +42,8 @@ function check_user() {
 function check_log() {
 	[ ! -f "$LOGPATH/exporter_merge_${DTIME}.log" ] && touch $LOGPATH/exporter_merge_${DTIME}.log
 	[ ! -f "$LOGPATH/exporter_node_${DTIME}.log" ] && touch $LOGPATH/exporter_node_${DTIME}.log
-	sudo chown -R $USER $LOGPATH }
+	sudo chown -R $USER $LOGPATH 
+}
 # Update 
 function update_source() {
 	sudo cp -R $SDIR/sbin $HOMEPATH
