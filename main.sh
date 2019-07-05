@@ -31,36 +31,35 @@ function check_homepath() {
 	do 
 		[ ! -d "${hpath}" ] && sudo mkdir -p "${hpath}"
 	done
-	echo \n "Check WORKDIR :"
-	echo -e $done
+	echo -e "Check WORKDIR : $done"
 }
 # Check User
 function check_user() {
 	sudo getent passwd $USER > /dev/null 2&>1
     	if [ $? -eq 0 ]; then
 	   	sudo chown -R $USER:$USER $HOMEPATH
+		echo -e "User : $success"
     	else
        		sudo useradd --no-create-home --shell /sbin/nologin ${USER}
 	   		sudo chown -R $USER:$USER $HOMEPATH
+			echo -e "User : $success"
     	fi
 }
 # Update 
 function update_source() {
+	sudo rm -rf $BINARYPATH/metrics
 	yes | sudo cp -rf $SDIR/sbin $HOMEPATH
 	yes | sudo cp -rf $SDIR/services $HOMEPATH
 	yes | sudo cp -rf $SDIR/scripts $HOMEPATH
 	yes | sudo cp -rf $SDIR/var/${exp_name}.yaml $CNFPATH
 	sudo chmod +x $BINARYPATH -R
-	echo \n "Update Source :"
-	echo -e $done
+	echo -e "Update Source : $done"
+
 }
-function setup_service() {
-	for i in "${service[@]}"
-	do 
-		/bin/bash $SCRPATH/exporter_${i}.sh
-		echo \n "Deploy exporter_${i} :"
-		echo -e $done
-	done
+function setup_service() { 
+		sudo /bin/sh $SCRPATH/exporter_${arr}.sh
+		echo -e "Deploy exporter_${arr} : $done"
+
 }
 
 # Step 1: Base Check
@@ -69,6 +68,9 @@ check_user
 update_source
 init_file
 # Step 2: Setup Exporter Service
-setup_service
-echo \n "Install successful"
+for arr in "${service[@]}"
+do 
+	setup_service
+done
+echo -e "Install successful"
 #END
