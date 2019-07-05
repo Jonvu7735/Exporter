@@ -53,12 +53,13 @@ function stop_exporter() {
 	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
 
 	if [[ $os == 6 ]]; then
-		pid=`ps aux | grep -v grep | grep "${exp_name}" | sed 's/  \+/ /g' | cut -d' ' -f2`
-		sudo kill -9 ${pid} 
-		echo -e $"Kill $exp_name : $success"
+		/etc/init.d/${exp_name} stop
+		RETVAL=$?
+		[ $RETVAL -eq 0 ] && sudo /usr/bin/pkill ${exp_name}
+		echo -e "Kill $exp_name : $success"
 	elif [[ $os == 7 ]]; then
 		systemctl kill ${exp_name}
-		echo -e $"Kill $exp_name : $success"
+		echo -e "Kill $exp_name : $success"
 	else
         echo -e "Process $exp_name not Kill : $fail"
 	fi		
@@ -67,10 +68,10 @@ function start_exporter() {
 	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
 	if [[ $os == 6 ]]; then
 		/etc/init.d/${exp_name} start >> ${DLog}
-		echo -e $"Start $exp_name : $success"
+		echo -e "Start $exp_name : $success"
 	elif [[ $os == 7 ]]; then
 		sudo systemctl start ${exp_name}.service >> ${DLog}
-		echo -e $"Start $exp_name : $success"
+		echo -e "Start $exp_name : $success"
 	else
         echo "Can not start ${exp_name} : $fail"
 	fi
@@ -107,7 +108,7 @@ function chk_cnf() {
 function ln_file() {
 	[ ! -f "${CNFPATH}/${exp_name}.yml" ] && sudo ln -s $CNFPATH/$exp_name.yml $BINARYPATH/config.yml
 	[ ! -d "${BINARYPATH}/metrics"] && sudo ln -s $SVPATH/$exp_name/metrics $BINARYPATH/metrics
-	echo "Soft Link Config : $done"
+	echo -e "Soft Link Config : $done"
 }
 
 # Step 1

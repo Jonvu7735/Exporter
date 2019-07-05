@@ -51,8 +51,9 @@ function stop_exporter() {
 	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
 
 	if [[ $os == 6 ]]; then
-		pid=`ps aux | grep -v grep | grep "${exp_name}" | sed 's/  \+/ /g' | cut -d' ' -f2`
-		sudo kill -9 ${pid} 
+		/etc/init.d/${exp_name} stop
+		RETVAL=$?
+		[ $RETVAL -eq 0 ] && sudo /usr/bin/pkill ${exp_name}
 		echo -e $"Kill $exp_name : $success"
 	elif [[ $os == 7 ]]; then
 		systemctl kill ${exp_name}
