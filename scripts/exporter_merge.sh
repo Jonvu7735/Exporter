@@ -58,8 +58,7 @@ function start_exporter() {
 		/etc/init.d/${exp_name} start >> ${DLog}
 		echo -e $"Start $exp_name : $success"
 	elif [[ $os == 7 ]]; then
-		sudo systemctl stop ${exp_name}.service >> ${DLog}
-		sudo systemctl start ${exp_name}.service >> ${DLog}
+		sudo systemctl stop ${exp_name}.service ; sudo systemctl start ${exp_name}.service >> ${DLog}
 		echo -e $"Start $exp_name : $success"
 	else
         echo "Can not start ${exp_name}"

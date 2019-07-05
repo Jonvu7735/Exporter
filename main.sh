@@ -9,8 +9,7 @@ fail="[$Red Fail $RCol]"
 done="[$Gre Done $RCol]"
 ########################################################################################################################################################
 # Declare Variables
-declare -a service
-service=("merge" "node") ### <<- INPUT SERVICE HERE
+service=('merge' 'node') ### <<- INPUT SERVICE HERE
 # Not need change
 DTIME=$(date +"%Y%m%d")
 SDIR=`pwd`
@@ -58,8 +57,6 @@ function update_source() {
 }
 function setup_service() { 
 		sudo /bin/sh $SCRPATH/exporter_${arr}.sh
-		echo -e "Deploy exporter_${arr} : $done"
-
 }
 
 # Step 1: Base Check

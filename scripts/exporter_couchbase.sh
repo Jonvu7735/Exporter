@@ -60,8 +60,7 @@ function start_exporter() {
 		/etc/init.d/${exp_name} start >> ${DLog}
 		echo -e $"Start $exp_name : $success"
 	elif [[ $os == 7 ]]; then
-		sudo systemctl stop ${exp_name}.service >> ${DLog}
-		sudo systemctl start ${exp_name}.service >> ${DLog}
+		sudo systemctl stop ${exp_name}.service ; sudo systemctl start ${exp_name}.service >> ${DLog}
 		echo -e $"Start $exp_name : $success"
 	else
         echo "Can not start ${exp_name}"
@@ -94,14 +93,12 @@ function chk_cnf() {
 	bucket: true
 	xdcr: true
 	" > $CNFPATH/$exp_name.yml
-	echo "Create CNF file :"
-	echo -e $done
+	echo -e "Create CNF file : $done"
 }
 function ln_file() {
 	[ ! -f "${CNFPATH}/${exp_name}.yml" ] && sudo ln -s $CNFPATH/$exp_name.yml $BINARYPATH/config.yml
 	[ ! -d "${BINARYPATH}/metrics"] && sudo ln -s $SVPATH/$exp_name/metrics $BINARYPATH/metrics
-	echo "Soft Link Config :"
-	echo -e $done
+	echo "Soft Link Config : $done"
 }
 
 
