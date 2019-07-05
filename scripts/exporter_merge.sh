@@ -56,7 +56,7 @@ function stop_exporter() {
 		[ $RETVAL -eq 0 ] && sudo /usr/bin/kill $(pgrep ${exp_name})
 		echo -e $"Kill $exp_name : $success"
 	elif [[ $os == 7 ]]; then
-		kill -9 $(pgrep ${exp_name})
+		sudo kill -9 $(pgrep ${exp_name})
 		echo -e $"Kill $exp_name : $success"
 	else
         echo -e "Process $exp_name not Kill : $fail"
