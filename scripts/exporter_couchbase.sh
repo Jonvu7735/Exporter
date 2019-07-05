@@ -83,8 +83,9 @@ function chk_cnf() {
 	echo -e $done
 }
 function ln_file() {
-	[ -f "$CNFPATH/${exp_name}.yml" ] && sudo ln -s $CNFPATH/$exp_name.yml $BINARYPATH/config.yml
-	echo "Soft Link file :"
+	[ ! -f "${CNFPATH}/${exp_name}.yml" ] && sudo ln -s $CNFPATH/$exp_name.yml $BINARYPATH/config.yml
+	[ ! -d "${BINARYPATH}/metrics"] && sudo ln -s $SVPATH/$exp_name/metrics $BINARYPATH/metrics
+	echo "Soft Link Config :"
 	echo -e $done
 }
 function stop_exporter() {
