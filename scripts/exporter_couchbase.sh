@@ -101,14 +101,12 @@ function ln_file() {
 	echo "Soft Link Config : $done"
 }
 
-
 # Step 1
-stop_exporter 
-# Step 2
 check_log
 init_file
 [ ! -f "$CNFPATH/${exp_name}.yml" ]  && chk_cnf
 ln_file
-# Step 3
+# Step 2
+stop_exporter 
 start_exporter
 # END

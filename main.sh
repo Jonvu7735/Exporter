@@ -63,11 +63,9 @@ function setup_service() {
 check_homepath
 check_user
 update_source
-init_file
 # Step 2: Setup Exporter Service
 for arr in "${service[@]}"
 do 
 	setup_service
 done
-echo -e "Install successful"
 #END

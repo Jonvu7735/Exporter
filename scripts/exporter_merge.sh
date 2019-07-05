@@ -71,5 +71,4 @@ init_file
 # Step 2
 stop_exporter 
 start_exporter 
-echo "Install ${exp_name} Complete"
 # END
