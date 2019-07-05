@@ -53,10 +53,10 @@ function stop_exporter() {
 	if [[ $os == 6 ]]; then
 		/etc/init.d/${exp_name} stop
 		RETVAL=$?
-		[ $RETVAL -eq 0 ] && sudo /usr/bin/pkill ${exp_name}
+		[ $RETVAL -eq 0 ] && sudo /usr/bin/kill $(pgrep ${exp_name})
 		echo -e $"Kill $exp_name : $success"
 	elif [[ $os == 7 ]]; then
-		systemctl kill ${exp_name}
+		kill -9 $(pgrep ${exp_name})
 		echo -e $"Kill $exp_name : $success"
 	else
         echo -e "Process $exp_name not Kill : $fail"
