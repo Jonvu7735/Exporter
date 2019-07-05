@@ -79,28 +79,29 @@ function start_exporter() {
 function chk_cnf() {
 	[ ! -f "$CNFPATH/${exp_name}.yml" ] && sudo touch $CNFPATH/$exp_name.yml
 	sudo chown $USER:$USER $CNFPATH/$exp_name.yml
-	echo "---	
+	echo "---
+	
 web:
-listenAddress: :11022
-telemetryPath: /metrics
-timeout: 10s
+  listenAddress: :11022
+  telemetryPath: /metrics
+  timeout: 10s
 
 db:
-user: "${uservar}"
-password: "${passvar}"
-uri: http://localhost:8091
-timeout: 10s
+  user: "${uservar}"
+  password: "${passvar}"
+  uri: http://localhost:8091
+  timeout: 10s
 
 log:
-level: info
-format: text
+  level: info
+  format: text
 
 scrape:
-cluster: true
-node: true
-bucket: true
-xdcr: true " > $CNFPATH/$exp_name.yml
-	echo -e "Create CNF file : $done"
+  cluster: true
+  node: true
+  bucket: true
+  xdcr: true " > $CNFPATH/$exp_name.yml
+echo -e "Create CNF file : $done"
 }
 function ln_file() {
 	[ -f "${CNFPATH}/${exp_name}.yml" ] && sudo ln -s $CNFPATH/$exp_name.yml $BINARYPATH/config.yml
