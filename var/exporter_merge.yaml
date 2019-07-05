@@ -20,3 +20,7 @@ exporters:
 - url: http://localhost:11036/metrics
 #mongodb
 - url: http://localhost:11038/metrics
+#process exporter
+- url: http://localhost:11040/metrics
+#ping exporter
+- url: http://localhost:11041/metrics
