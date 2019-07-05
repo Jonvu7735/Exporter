@@ -1,9 +1,8 @@
 #!/bin/bash
 
 RETVAL=0
-PROG="exporter_node"
+PROG="exporter_merge"
 EXEC="/etc/prometheus/sbin/exporter_merge "
-PID="/tmp/$PROG.pid"
 LOCKFILE="/var/lock/subsys/$PROG"
 OPTIONS="--config-path=/etc/prometheus/var/exporter_merge.yaml --listen-port=11011"
 

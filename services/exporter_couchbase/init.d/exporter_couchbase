@@ -3,7 +3,6 @@
 RETVAL=0
 PROG="exporter_couchbase"
 EXEC="/etc/prometheus/sbin/exporter_couchbase"
-PID="/tmp/$PROG.pid"
 LOCKFILE="/var/lock/subsys/$PROG"
 OPTIONS="config.file=/etc/prometheus/sbin/config.json"
 
