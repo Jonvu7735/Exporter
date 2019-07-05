@@ -43,45 +43,34 @@ function init_file() {
 		sudo systemctl daemon-reload >/dev/null 2>&1 
 		sudo systemctl enable ${exp_name}.services >/dev/null 2>&1 
 		echo -e "Init File: $done " 
-	
-
     else
-       echo -e "Can not detect OS"
+        echo "Can not detect OS"
     fi
 }
 function stop_exporter() {
-	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
 	local pid=`ps aux | grep -v grep | grep "${exp_name}" | sed 's/  \+/ /g' | cut -d' ' -f2`
-	if [[ $os == 6 ]]; then
 		sudo kill -9 $pid >/dev/null 2>&1
-		echo -e "Stopping $exp_name: $success" 
-	elif [[ $os == 7 ]]; then
-		sudo kill -9 $pid >/dev/null 2>&1
-		sudo systemctl stop ${exp_name}.service 
-		echo -e "Stopping $exp_name: $success"
-	else
-        echo -e "Process ${exp_name} NOT RUN"
-	fi
+		echo -e "Stopping $exp_name : $success"
 }
 function start_exporter() {
 	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
 	if [[ $os == 6 ]]; then
-		/etc/init.d/${exp_name} start 
-		echo -e $"Start $exp_name: $success"
+		/etc/init.d/${exp_name} start >> ${DLog}
+		echo -e $"Start $exp_name : $success"
 	elif [[ $os == 7 ]]; then
-		sudo systemctl start ${exp_name}.service 
-		echo -e $"Start $exp_name: $success"
+		sudo systemctl stop ${exp_name}.service >> ${DLog}
+		sudo systemctl start ${exp_name}.service >> ${DLog}
+		echo -e $"Start $exp_name : $success"
 	else
         echo "Can not start ${exp_name}"
 	fi
 }
 
 # Step 1
-stop_exporter >> ${DLog}
-# Step 2
 check_log
 init_file
-# Step 3
-start_exporter >> ${DLog}
-echo -n "Install ${exp_name} Complete"
+# Step 2
+stop_exporter 
+start_exporter 
+echo "Install ${exp_name} Complete"
 # END

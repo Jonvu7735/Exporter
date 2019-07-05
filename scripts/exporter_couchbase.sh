@@ -35,22 +35,37 @@ function init_file() {
 		sudo chown -R $USER:$USER /etc/init.d/exporter_*
 		sudo chkconfig --add ${exp_name} >/dev/null 2>&1 
 		sudo chkconfig on ${exp_name} >/dev/null 2>&1 
-		echo \n "INIT FILE : "
-		echo -e $done
+		echo -e "Init File: $done "
 
 	elif [[ $os == 7 ]]; then
-		yes | sudo cp -f $SVPATH/${exp_name}/init.d/${exp_name} /etc/init.d/
+		yes | sudo cp -f $SVPATH/${exp_name}/systemd/${exp_name}.service /etc/systemd/system/
 
 		sudo chmod +x /etc/systemd/system/exporter_*.service
 		sudo chown -R $USER:$USER /etc/systemd/system/exporter_*.service
 		sudo systemctl daemon-reload >/dev/null 2>&1 
-		sudo systemctl enable ${exp_name}.services >/dev/null 2>&1
-		echo \n "INIT FILE : "
-		echo -e $done 	
-
+		sudo systemctl enable ${exp_name}.services >/dev/null 2>&1 
+		echo -e "Init File: $done " 
     else
-       echo \n "Can not detect OS"
+        echo "Can not detect OS"
     fi
+}
+function stop_exporter() {
+	local pid=`ps aux | grep -v grep | grep "${exp_name}" | sed 's/  \+/ /g' | cut -d' ' -f2`
+		sudo kill -9 $pid >/dev/null 2>&1
+		echo -e "Stopping $exp_name : $success"
+}
+function start_exporter() {
+	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
+	if [[ $os == 6 ]]; then
+		/etc/init.d/${exp_name} start >> ${DLog}
+		echo -e $"Start $exp_name : $success"
+	elif [[ $os == 7 ]]; then
+		sudo systemctl stop ${exp_name}.service >> ${DLog}
+		sudo systemctl start ${exp_name}.service >> ${DLog}
+		echo -e $"Start $exp_name : $success"
+	else
+        echo "Can not start ${exp_name}"
+	fi
 }
 function chk_cnf() {
 	[ ! -f "$CNFPATH/${exp_name}.yml"] && sudo touch $CNFPATH/$exp_name.yml
@@ -88,35 +103,7 @@ function ln_file() {
 	echo "Soft Link Config :"
 	echo -e $done
 }
-function stop_exporter() {
-	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
-	local pid=`ps aux | grep -v grep | grep "${exp_name}" | sed 's/  \+/ /g' | cut -d' ' -f2`
-	if [[ $os == 6 ]]; then
-		sudo kill -9 $pid
-		echo \n $"Stopping $exp_name: "
-		echo -e $success
-	elif [[ $os == 7 ]]; then
-		sudo kill -9 $pid
-		echo \n $"Stopping $exp_name: "
-		echo -e $success
-	else
-        echo \n "Process ${exp_name} NOT RUN"
-	fi
-}
-function start_exporter() {
-	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
-	if [[ $os == 6 ]]; then
-		/etc/init.d/${exp_name} start
-		echo \n $"Start $exp_name: "
-		echo -e $success
-	elif [[ $os == 7 ]]; then
-		sudo systemctl start ${exp_name}.service
-		echo \n $"Start $exp_name: "
-		echo -e $success
-	else
-        echo \n "Can not start ${exp_name}"
-	fi
-}
+
 
 # Step 1
 stop_exporter 
