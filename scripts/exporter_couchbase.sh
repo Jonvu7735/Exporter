@@ -100,7 +100,7 @@ stop_exporter
 # Step 2
 check_log
 init_file
-chk_cnf
+[ ! -f "$CNFPATH/${exp_name}.yml" ]  && chk_cnf
 ln_file
 # Step 3
 start_exporter
