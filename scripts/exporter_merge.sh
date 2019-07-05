@@ -1,6 +1,4 @@
 #!/bin/bash
-read -p 'Username: ' uservar
-read -sp 'Password: ' passvar
 # Text Reset
 RCol='\e[0m'    
 Gre='\e[0;32m'
@@ -10,7 +8,7 @@ fail="[$Red Fail $RCol]"
 done="[$Gre Done $RCol]"
 # Declare Variables
 ### Change here
-exp_name="exporter_couchbase"
+exp_name="exporter_merge"
 ### Not need change
 DTIME=$(date +"%Y%m%d")
 HOMEPATH="/etc/prometheus"
@@ -35,57 +33,22 @@ function init_file() {
 		sudo chown -R $USER:$USER /etc/init.d/exporter_*
 		sudo chkconfig --add ${exp_name} >/dev/null 2>&1 
 		sudo chkconfig on ${exp_name} >/dev/null 2>&1 
-		echo \n "INIT FILE : "
+		echo \n "Init File: "
 		echo -e $done
 
 	elif [[ $os == 7 ]]; then
-		yes | sudo cp -f $SVPATH/${exp_name}/init.d/${exp_name} /etc/init.d/
+		yes | sudo cp -f $SVPATH/${exp_name}/systemd/${exp_name}.service /etc/systemd/system/
 
 		sudo chmod +x /etc/systemd/system/exporter_*.service
 		sudo chown -R $USER:$USER /etc/systemd/system/exporter_*.service
 		sudo systemctl daemon-reload >/dev/null 2>&1 
-		sudo systemctl enable ${exp_name}.services >/dev/null 2>&1
-		echo \n "INIT FILE : "
-		echo -e $done 	
+		sudo systemctl enable ${exp_name}.services >/dev/null 2>&1 
+		echo \n "Init File: "
+		echo -e $done	
 
     else
        echo \n "Can not detect OS"
     fi
-}
-function chk_cnf() {
-	[ ! -f "$CNFPATH/${exp_name}.yml"] && sudo touch $CNFPATH/$exp_name.yml
-	sudo chown $USER:$USER $CNFPATH/$exp_name.yml
-	echo "
-	---
-	
-	web:
-	listenAddress: :11022
-	telemetryPath: /metrics
-	timeout: 10s
-
-	db:
-	user: ${uservar}
-	password: ${passvar}
-	uri: http://localhost:8091
-	timeout: 10s
-
-	log:
-	level: info
-	format: text
-
-	scrape:
-	cluster: true
-	node: true
-	bucket: true
-	xdcr: true
-	" > $CNFPATH/$exp_name.yml
-	echo "Create CNF file :"
-	echo -e $done
-}
-function ln_file() {
-	[ -f "$CNFPATH/${exp_name}.yml" ] && sudo ln -s $CNFPATH/$exp_name.yml $BINARYPATH/config.yml
-	echo "Soft Link file :"
-	echo -e $done
 }
 function stop_exporter() {
 	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
@@ -122,8 +85,6 @@ stop_exporter
 # Step 2
 check_log
 init_file
-[ ! -f "$CNFPATH/${exp_name}.yml" ]  && chk_cnf
-ln_file
 # Step 3
 start_exporter
 # END

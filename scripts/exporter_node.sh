@@ -1,4 +1,11 @@
 #!/bin/bash
+# Text Reset
+RCol='\e[0m'    
+Gre='\e[0;32m'
+Red='\e[0;31m'
+success="[$Gre OK $RCol]"
+fail="[$Red Fail $RCol]"
+done="[$Gre Done $RCol]"
 # Declare Variables
 ### Change here
 exp_name="exporter_node"
@@ -20,20 +27,24 @@ function check_log() {
 function init_file() {
     os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
 	if [[ $os == 6 ]]; then
-		[ ! -f "/etc/init.d/${exp_name}" ] && sudo cp $SVPATH/${exp_name}/init.d/${exp_name} /etc/init.d/
+		yes | sudo cp -f $SVPATH/${exp_name}/init.d/${exp_name} /etc/init.d/
 
 		sudo chmod +x /etc/init.d/exporter_*
 		sudo chown -R $USER:$USER /etc/init.d/exporter_*
 		sudo chkconfig --add ${exp_name} >/dev/null 2>&1 
 		sudo chkconfig on ${exp_name} >/dev/null 2>&1 
+		echo \n "Init File: "
+		echo -e $done
 
 	elif [[ $os == 7 ]]; then
-		[ ! -f "/etc/systemd/system/${exp_name}.service" ] && sudo cp $SVPATH/${exp_name}/systemd/${exp_name}.service /etc/systemd/system/
+		yes | sudo cp -f $SVPATH/${exp_name}/systemd/${exp_name}.service /etc/systemd/system/
 
 		sudo chmod +x /etc/systemd/system/exporter_*.service
 		sudo chown -R $USER:$USER /etc/systemd/system/exporter_*.service
 		sudo systemctl daemon-reload >/dev/null 2>&1 
-		sudo systemctl enable ${exp_name}.services >/dev/null 2>&1 	
+		sudo systemctl enable ${exp_name}.services >/dev/null 2>&1 
+		echo \n "Init File: "
+		echo -e $done	
 
     else
        echo \n "Can not detect OS"
@@ -41,14 +52,17 @@ function init_file() {
 }
 function stop_exporter() {
 	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
+	local pid=`ps aux | grep -v grep | grep "${exp_name}" | sed 's/  \+/ /g' | cut -d' ' -f2`
 	if [[ $os == 6 ]]; then
-		/etc/init.d/${exp_name} stop
+		sudo kill -9 $pid
 		echo \n $"Stopping $exp_name: "
+		echo -e $success
 	elif [[ $os == 7 ]]; then
-		sudo systemctl stop ${exp_name}.service
+		sudo kill -9 $pid
 		echo \n $"Stopping $exp_name: "
+		echo -e $success
 	else
-        echo \n "Can not stop ${exp_name}"
+        echo \n "Process ${exp_name} NOT RUN"
 	fi
 }
 function start_exporter() {
@@ -56,19 +70,21 @@ function start_exporter() {
 	if [[ $os == 6 ]]; then
 		/etc/init.d/${exp_name} start
 		echo \n $"Start $exp_name: "
+		echo -e $success
 	elif [[ $os == 7 ]]; then
 		sudo systemctl start ${exp_name}.service
 		echo \n $"Start $exp_name: "
+		echo -e $success
 	else
         echo \n "Can not start ${exp_name}"
 	fi
 }
 
 # Step 1
-stop_exporter >> $DLog
+stop_exporter 
 # Step 2
-check_log >> $DLog
-init_file >> $DLog
+check_log 
+init_file 
 # Step 3
-start_exporter >> $DLog
+start_exporter 
 # END

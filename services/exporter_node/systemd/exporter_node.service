@@ -1,14 +1,21 @@
 [Unit]
 Description=Exporter Node
-After=network-online.target
+After=network-online.target network.target
 
 [Service]
 Type=simple
 User=prometheus
+Group=prometheus
 ExecStart=/etc/prometheus/sbin/exporter_node --web.listen-address=:11020
-ExecStop    = kill -INT $MAINPID
-ExecReload  = kill -TERM $MAINPID
+ExecReload=/bin/kill $MAINPID
+KillSignal=SIGQUIT
+TimeoutStopSec=60
+KillMode=process
 Restart=on-failure
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=exporter_node
 
 [Install]
 WantedBy=multi-user.target

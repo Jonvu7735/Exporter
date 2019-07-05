@@ -6,14 +6,17 @@ Gre='\e[0;32m'
 Red='\e[0;31m'
 success="[$Gre OK $RCol]"
 fail="[$Red Fail $RCol]"
+done="[$Gre Done $RCol]"
 ########################################################################################################################################################
 # Declare Variables
-exp_name="exprter_merge"
+declare -a service
+service=("merge" "node") ### <<- INPUT SERVICE HERE
 # Not need change
 DTIME=$(date +"%Y%m%d")
 SDIR=`pwd`
 HOMEPATH="/etc/prometheus"
 USER='prometheus'
+exp_name="exporter_merge"
 BINARYPATH=${HOMEPATH}/sbin
 LOGPATH=${HOMEPATH}/logs
 CNFPATH=${HOMEPATH}/var
@@ -28,6 +31,8 @@ function check_homepath() {
 	do 
 		[ ! -d "${hpath}" ] && sudo mkdir -p "${hpath}"
 	done
+	echo \n "Check WORKDIR :"
+	echo -e $done
 }
 # Check User
 function check_user() {
@@ -39,76 +44,31 @@ function check_user() {
 	   		sudo chown -R $USER:$USER $HOMEPATH
     	fi
 }
-# Log File
-function check_log() {
-	[ ! -f "$LOGPATH/${exp_name}_${DTIME}.log" ] && touch $LOGPATH/${exp_name}_${DTIME}.log
-	sudo chown -R $USER:$USER $HOMEPATH 
-}
 # Update 
 function update_source() {
 	yes | sudo cp -rf $SDIR/sbin $HOMEPATH
 	yes | sudo cp -rf $SDIR/services $HOMEPATH
 	yes | sudo cp -rf $SDIR/scripts $HOMEPATH
-	yes | sudo cp $SDIR/var/${exp_name}.yaml $CNFPATH
+	yes | sudo cp -rf $SDIR/var/${exp_name}.yaml $CNFPATH
 	sudo chmod +x $BINARYPATH -R
+	echo \n "Update Source :"
+	echo -e $done
 }
-function init_file() {
-        os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
-	if [[ $os == 6 ]]; then
-		[ ! -f "/etc/init.d/${exp_name}" ] && sudo cp $SVPATH/${exp_name}/init.d/${exp_name} /etc/init.d/
-
-		sudo chmod +x /etc/init.d/exporter_*
-		sudo chown $USER:$USER /etc/init.d/exporter_*
-		sudo chkconfig --add ${exp_name} >/dev/null 2>&1 
-		sudo chkconfig on ${exp_name} >/dev/null 2>&1 
-
-	elif [[ $os == 7 ]]; then
-		[ ! -f "/etc/systemd/system/${exp_name}.service" ] && sudo cp $SVPATH/${exp_name}/systemd/${exp_name}.service /etc/systemd/system/
-
-		sudo chmod +x /etc/systemd/system/exporter_*.service
-		sudo chown $USER:$USER /etc/systemd/system/exporter_*.service
-		sudo systemctl daemon-reload
-		sudo systemctl enable ${exp_name}.service
-
-    else
-       echo "Can not detect OS"
-    fi
-}
-# Funtion Start/Stop
-function stop_exporter() {
-	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
-	if [[ $os == 6 ]]; then
-		/etc/init.d/${exp_name} stop
-		echo \n $"Stopping $exp_name: "
-	elif [[ $os == 7 ]]; then
-		sudo systemctl stop ${exp_name}.service
-		echo \n $"Stopping $exp_name: "
-	else
-        echo \n "Can not stop ${exp_name}"
-	fi
-}
-function start_exporter() {
-	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
-	if [[ $os == 6 ]]; then
-		/etc/init.d/${exp_name} start
-		echo \n $"Start $exp_name: "
-	elif [[ $os == 7 ]]; then
-		sudo systemctl start ${exp_name}.service
-		echo \n $"Start $exp_name: "
-	else
-        echo \n "Can not start ${exp_name}"
-	fi
+function setup_service() {
+	for i in "${service[@]}"
+	do 
+		/bin/bash $SCRPATH/exporter_${i}.sh
+		echo \n "Deploy exporter_${i} :"
+		echo -e $done
+	done
 }
 
-# Step 1: Stop service
-stop_exporter
-# Step 2: Base Check
+# Step 1: Base Check
 check_homepath
 check_user
-check_log
 update_source
 init_file
-# Step 2: Start ${exp_name} & Node
-start_exporter
-echo "Install successful"
+# Step 2: Setup Exporter Service
+setup_service
+echo \n "Install successful"
 #END

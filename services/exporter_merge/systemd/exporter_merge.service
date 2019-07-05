@@ -1,14 +1,22 @@
 [Unit]
 Description=Exporter Merge
-After=network-online.target
+After=network-online.target network.target
+ConditionPathExists=/etc/prometheus/var/exporter_merge.yaml
 
 [Service]
 Type=simple
 User=prometheus
+Group=prometheus
 ExecStart=/etc/prometheus/sbin/exporter_merge --config-path=/etc/prometheus/var/exporter_merge.yaml --listen-port 11011
-ExecStop    = kill -INT $MAINPID
-ExecReload  = kill -TERM $MAINPID
+ExecReload=/bin/kill $MAINPID
+KillSignal=SIGQUIT
+TimeoutStopSec=11
+KillMode=process
 Restart=on-failure
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=exporter_merge
 
 [Install]
 WantedBy=multi-user.target

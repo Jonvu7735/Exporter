@@ -1,14 +1,21 @@
 [Unit]
 Description=Exporter Couchbase
-After=network-online.target
+After=network-online.target network.target
 
 [Service]
 Type=simple
 User=prometheus
-ExecStart=/etc/prometheus/sbin/exporter_couchbase 
-ExecStop    = kill -INT $MAINPID
-ExecReload  = kill -TERM $MAINPID
+Group=prometheus
+ExecStart=/etc/prometheus/sbin/exporter_couchbase config.file=/etc/prometheus/sbin/config.json
+ExecReload=/bin/kill $MAINPID
+KillSignal=SIGQUIT
+TimeoutStopSec=60
+KillMode=process
 Restart=on-failure
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=exporter_couchbase
 
 [Install]
 WantedBy=multi-user.target
