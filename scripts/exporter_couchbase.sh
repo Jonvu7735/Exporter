@@ -15,26 +15,7 @@ DLog="${LOGPATH}/deploy_$IP_$DTIME.log"
 ### FUNTION 
 function check_log() {
 	[ ! -f "$LOGPATH/${exp_name}_${DTIME}.log" ] && touch $LOGPATH/${exp_name}_${DTIME}.log	
-	sudo chown -R $USER: $LOGPATH
-}
-function stop_exporter() {
-	ps=`ps aux | grep -v grep | grep -v rsync | grep "${exp_name}"`
-	c=`ps aux | grep -v grep | grep -v rsync | grep "${exp_name}" | wc -l`
-
-	echo -n $"Stopping $exp_name: "
-	if [ $c -gt 0 ]; then
-		pids=`echo "$ps" | sed 's/  \+/ /g' | cut -d' ' -f2`
-		kill -9 $pids 
-		echo -e $success
-	fi
-}
-function start_exporter() {
-	ps=`ps aux | grep -v grep | grep -v rsync | grep "${exp_name}"`
-    c=`ps aux | grep -v grep | grep -v rsync | grep "${exp_name}" | wc -l`
-	if [ $c -gt 0 ]]; then
-        $BINARYPATH/${exp_name} --config.file=$CNFPATH/${exp_name}.yml >> $LOGPATH/${exp_name}_${DTIME}.log &
-        echo -e $success
-	fi
+	sudo chown -R $USER:$USER $HOMEPATH
 }
 function init_file() {
     os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
@@ -42,30 +23,85 @@ function init_file() {
 		[ ! -f "/etc/init.d/${exp_name}" ] && sudo cp $SVPATH/${exp_name}/init.d/${exp_name} /etc/init.d/
 
 		sudo chmod +x /etc/init.d/exporter_*
-		chkconfig --add ${exp_name} >/dev/null 2>&1 
-		chkconfig on ${exp_name} >/dev/null 2>&1 
+		sudo chown -R $USER:$USER /etc/init.d/exporter_*
+		sudo chkconfig --add ${exp_name} >/dev/null 2>&1 
+		sudo chkconfig on ${exp_name} >/dev/null 2>&1 
 
 	elif [[ $os == 7 ]]; then
 		[ ! -f "/etc/systemd/system/${exp_name}.service" ] && sudo cp $SVPATH/${exp_name}/systemd/${exp_name}.service /etc/systemd/system/
+
 		sudo chmod +x /etc/systemd/system/exporter_*.service
-		sudo systemctl daemon-reload
-		sudo systemctl enable ${exp_name}.service
+		sudo chown -R $USER:$USER /etc/systemd/system/exporter_*.service
+		sudo systemctl daemon-reload >/dev/null 2>&1 
+		sudo systemctl enable ${exp_name}.services >/dev/null 2>&1 	
 
     else
-       echo "Can not detect OS"
+       echo \n "Can not detect OS"
     fi
 }
+function chk_cnf() {
+	[ ! -f "$CNFPATH/${exp_name}.yml"] && sudo touch $CNFPATH/$exp_name.yml
+	sudo chown $USER:$USER $CNFPATH/$exp_name.yml
+	echo "
+	---
+	
+	web:
+	listenAddress: :11022
+	telemetryPath: /metrics
+	timeout: 10s
+
+	db:
+	user: #Enter user here
+	password: #Enter password here
+	uri: http://localhost:8091
+	timeout: 10s
+
+	log:
+	level: info
+	format: text
+
+	scrape:
+	cluster: true
+	node: true
+	bucket: true
+	xdcr: true
+	" > $CNFPATH/$exp_name.yml
+}
 function ln_file() {
-	ln -s $CNFPATH/$exp_name.yml $BINARYPATH/config.yml
+	[ -f "$CNFPATH/${exp_name}.yml" ] && sudo ln -s $CNFPATH/$exp_name.yml $BINARYPATH/config.yml
+}
+function stop_exporter() {
+	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
+	if [[ $os == 6 ]]; then
+		/etc/init.d/${exp_name} stop
+		echo \n $"Stopping $exp_name: "
+	elif [[ $os == 7 ]]; then
+		sudo systemctl stop ${exp_name}.service
+		echo \n $"Stopping $exp_name: "
+	else
+        echo \n "Can not stop ${exp_name}"
+	fi
+}
+function start_exporter() {
+	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
+	if [[ $os == 6 ]]; then
+		/etc/init.d/${exp_name} start
+		echo \n $"Start $exp_name: "
+	elif [[ $os == 7 ]]; then
+		sudo systemctl start ${exp_name}.service
+		echo \n $"Start $exp_name: "
+	else
+        echo \n "Can not start ${exp_name}"
+	fi
 }
 
 # Step 1
-
+stop_exporter 
 # Step 2
 check_log
 init_file
+chk_cnf
 ln_file
 # Step 3
-stop_exporter
 start_exporter
 # END
