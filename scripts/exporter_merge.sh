@@ -48,8 +48,8 @@ function init_file() {
     fi
 }
 function stop_exporter() {
-	local pid=`ps aux | grep -v grep | grep "${exp_name}" | sed 's/  \+/ /g' | cut -d' ' -f2`
-		sudo kill -9 $pid >/dev/null 2>&1
+		local pid=`ps aux | grep -v grep | grep "${exp_name}" | sed 's/  \+/ /g' | cut -d' ' -f2` ;
+		sudo /bin/kill -9 $pid
 		echo -e "Stopping $exp_name : $success"
 }
 function start_exporter() {
