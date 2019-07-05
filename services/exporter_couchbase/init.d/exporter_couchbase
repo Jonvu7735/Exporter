@@ -4,7 +4,7 @@ RETVAL=0
 PROG="exporter_couchbase"
 EXEC="/etc/prometheus/sbin/exporter_couchbase"
 LOCKFILE="/var/lock/subsys/$PROG"
-OPTIONS="config.file=/etc/prometheus/sbin/config.json"
+OPTIONS="config.file=/etc/prometheus/sbin/config.yml"
 
 # Source function library.
 if [ -f /etc/rc.d/init.d/functions ]; then

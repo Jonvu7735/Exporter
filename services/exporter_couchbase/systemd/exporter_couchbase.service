@@ -6,7 +6,7 @@ After=network-online.target network.target
 Type=simple
 User=prometheus
 Group=prometheus
-ExecStart=/etc/prometheus/sbin/exporter_couchbase config.file=/etc/prometheus/sbin/config.json
+ExecStart=/etc/prometheus/sbin/exporter_couchbase config.file=/etc/prometheus/sbin/config.yml
 ExecReload=/bin/kill $MAINPID
 KillSignal=SIGQUIT
 TimeoutStopSec=60
