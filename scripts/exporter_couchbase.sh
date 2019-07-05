@@ -80,7 +80,7 @@ function chk_cnf() {
 	[ ! -f "$CNFPATH/${exp_name}.yml" ] && sudo touch $CNFPATH/$exp_name.yml
 	sudo chown $USER:$USER $CNFPATH/$exp_name.yml
 	echo "---
-	
+
 web:
   listenAddress: :11022
   telemetryPath: /metrics
