@@ -24,3 +24,5 @@ exporters:
 - url: http://localhost:11040/metrics
 #ping exporter
 - url: http://localhost:11041/metrics
+#ccu exporter
+- url: http://localhost:11042/metrics
