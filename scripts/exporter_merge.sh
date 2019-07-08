@@ -51,12 +51,12 @@ function stop_exporter() {
 	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
 
 	if [[ $os == 6 ]]; then
-		/etc/init.d/${exp_name} stop
+		/etc/init.d/${exp_name} stop >/dev/null 2>&1 
 		RETVAL=$?
-		[ $RETVAL -eq 0 ] && sudo /usr/bin/kill $(pgrep ${exp_name})
+		[ $RETVAL -eq 0 ] && sudo /usr/bin/kill $(pgrep ${exp_name}) >/dev/null 2>&1
 		echo -e $"Kill $exp_name : $success"
 	elif [[ $os == 7 ]]; then
-		sudo kill -9 $(pgrep ${exp_name})
+		sudo kill -9 $(pgrep ${exp_name}) >/dev/null 2>&1
 		echo -e $"Kill $exp_name : $success"
 	else
         echo -e "Process $exp_name not Kill : $fail"
