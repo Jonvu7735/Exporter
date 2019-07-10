@@ -1,0 +1,21 @@
+[Unit]
+Description=Exporter Ping
+After=network-online.target network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/etc/prometheus/sbin/exporter_ping --config.path /etc/prometheus/var/exporter_ping.yaml --web.listen-address=:11041
+ExecReload=/bin/kill $MAINPID
+KillSignal=SIGQUIT
+TimeoutStopSec=60
+KillMode=process
+Restart=on-failure
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=exporter_ping
+
+[Install]
+WantedBy=multi-user.target
