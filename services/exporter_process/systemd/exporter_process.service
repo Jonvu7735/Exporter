@@ -1,0 +1,21 @@
+[Unit]
+Description=Exporter Process
+After=network-online.target network.target
+
+[Service]
+Type=simple
+User=prometheus
+Group=prometheus
+ExecStart=/etc/prometheus/sbin/exporter_process --config.path /etc/prometheus/var/exporter_process.yaml --web.listen-address=:11040
+ExecReload=/bin/kill $MAINPID
+KillSignal=SIGQUIT
+TimeoutStopSec=60
+KillMode=process
+Restart=on-failure
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=exporter_process
+
+[Install]
+WantedBy=multi-user.target

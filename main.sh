@@ -1,7 +1,7 @@
 #!/bin/bash
 ########################################################################################################################################################
 # Text Reset
-RCol='\e[0m'    
+RCol='\e[0m'
 Gre='\e[0;32m'
 Red='\e[0;31m'
 success="[$Gre OK $RCol]"
@@ -9,7 +9,7 @@ fail="[$Red Fail $RCol]"
 done="[$Gre Done $RCol]"
 ########################################################################################################################################################
 # Declare Variables
-service=('merge' 'node') ### <<- INPUT SERVICE HERE
+service=('merge' 'node' 'process') ### <<- INPUT SERVICE HERE
 # Not need change
 DTIME=$(date +"%Y%m%d")
 SDIR=`pwd`
@@ -27,7 +27,7 @@ DLog="${LOGPATH}/deploy_$IP_$DTIME.log"
 function check_homepath() {
 	arr_path=(${HOMEPATH} ${BINARYPATH} ${LOGPATH} ${CNFPATH} ${SVPATH} ${SCRPATH})
 	for hpath in "${arr_path[@]}"
-	do 
+	do
 		[ ! -d "${hpath}" ] && sudo mkdir -p "${hpath}"
 	done
 	echo -e "Check WORKDIR : $done"
@@ -44,7 +44,7 @@ function check_user() {
 			echo -e "User : $success"
     	fi
 }
-# Update 
+# Update
 function update_source() {
 	sudo rm -rf $BINARYPATH/metrics
 	yes | sudo cp -rf $SDIR/sbin $HOMEPATH
@@ -55,7 +55,7 @@ function update_source() {
 	echo -e "Update Source : $done"
 
 }
-function setup_service() { 
+function setup_service() {
 		sudo /bin/sh $SCRPATH/exporter_${arr}.sh
 }
 
@@ -65,7 +65,7 @@ check_user
 update_source
 # Step 2: Setup Exporter Service
 for arr in "${service[@]}"
-do 
+do
 	setup_service
 done
 #END
