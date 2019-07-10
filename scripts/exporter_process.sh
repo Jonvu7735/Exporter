@@ -10,6 +10,7 @@ done="[$Gre Done $RCol]"
 # Declare Variables
 ### Change here
 exp_name="exporter_process"
+
 ### Not need change
 os=$(grep -oP '(?<= )[0-9]+(?=\.)' /etc/redhat-release)
 DTIME=$(date +"%Y%m%d")
@@ -70,9 +71,22 @@ function start_exporter() {
   fi
 }
 
+function check_config() {
+    if [[ ! -f "${CNFPATH}/${exp_name}.yaml" ]]; then
+        local base_path=$(dirname "$0")
+        local var_path="${base_path}/../var/${exp_name}.yaml"
+        if [[ -f "${var_path}" && ! -f "${CNFPATH}/${exp_name}.yaml" ]]; then
+            sudo cp -f "${var_path}" "${CNFPATH}/${exp_name}.yaml" || sudo touch "${CNFPATH}/${exp_name}.yaml"
+            sudo chown -R $USER:$USER /"${CNFPATH}/${exp_name}.yaml"
+        fi
+        echo -e $"Check config: $success"
+    fi
+}
+
 # Step 1
 check_log
 init_file
+check_config
 # Step 2
 stop_exporter
 start_exporter
