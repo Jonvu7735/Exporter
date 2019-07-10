@@ -4,8 +4,8 @@ After=network-online.target network.target
 
 [Service]
 Type=simple
-User=prometheus
-Group=prometheus
+User=root
+Group=root
 ExecStart=/etc/prometheus/sbin/exporter_process --config.path /etc/prometheus/var/exporter_process.yaml --web.listen-address=:11040
 ExecReload=/bin/kill $MAINPID
 KillSignal=SIGQUIT
