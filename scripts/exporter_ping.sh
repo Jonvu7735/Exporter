@@ -73,15 +73,27 @@ function start_exporter() {
 
 function check_config() {
     if [[ ! -f "${CNFPATH}/${exp_name}.yaml" ]]; then
-        local base_path=$(dirname "$0")
-        local var_path="${base_path}/../var/${exp_name}.yaml"
-        if [[ -f "${var_path}" && ! -f "${CNFPATH}/${exp_name}.yaml" ]]; then
-            sudo cp -f "${var_path}" "${CNFPATH}/${exp_name}.yaml" || sudo touch "${CNFPATH}/${exp_name}.yaml"
-            sudo chown -R $USER:$USER /"${CNFPATH}/${exp_name}.yaml"
+        sudo bash -c "cat << EOF>"${CNFPATH}/${exp_name}.yaml"
+targets:
+  - localhost
+
+ping:
+  interval: 5s
+  timeout: 3s
+  history-size: 42
+  payload-size: 120
+
+EOF"
+        local revtal=$?
+        if [[ ${retval} != 0 ]]; then
+            sudo chown -R $USER:$USER "${CNFPATH}/${exp_name}.yaml"
+            echo -e $"Check config: $success"
+        else
+            echo -e $"Check config: $fail"
         fi
-        echo -e $"Check config: $success"
     fi
 }
+
 
 # Step 1
 check_log
