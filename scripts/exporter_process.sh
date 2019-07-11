@@ -87,10 +87,15 @@ process_names:
     cmdline:
     - -cp\s+\S*?(?P<jarname>[^:]*?\.jar)
 
-
   - name: '{{.ExeBase}}:{{.Matches.config}}'
     exe:
     - /usr/local/scribe/bin/zingscribe
+    cmdline:
+    - (?P<config>[^/]+\.conf)
+
+  - name: '{{.ExeBase}}:{{.Matches.config}}'
+    exe:
+    - /etc/scribe/bin/scribed
     cmdline:
     - (?P<config>[^/]+\.conf)
 
