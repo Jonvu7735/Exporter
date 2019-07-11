@@ -47,17 +47,17 @@ function init_file() {
     fi
 }
 function stop_exporter() {
-    if [[ $os == 6 ]]; then
-        /etc/init.d/${exp_name} stop >/dev/null 2>&1
-        retval=$?
-        [ $retval -eq 0 ] && sudo /usr/bin/kill "$(pgrep ${exp_name})" >/dev/null 2>&1
-        echo -e $"Kill $exp_name : $success"
-    elif [[ $os == 7 ]]; then
-        sudo kill -9 $(pgrep ${exp_name}) >/dev/null 2>&1
-        echo -e $"Kill $exp_name : $success"
-    else
-        echo -e "Process $exp_name not Kill : $fail"
-    fi
+	os=`cat /etc/redhat-release | grep -oP '(?<= )[0-9]+(?=\.)'`
+
+	if [[ $os == 6 ]]; then
+		/etc/init.d/${exp_name} stop >/dev/null 2>&1 
+		echo -e $"Stop $exp_name : $success"
+	elif [[ $os == 7 ]]; then
+		systemctl stop ${exp_name}.service >/dev/null 2>&1 
+		echo -e $"Stop $exp_name : $success"
+	else
+        echo -e "Process $exp_name not Stop : $fail"
+	fi		
 }
 function start_exporter() {
     if [[ $os == 6 ]]; then
