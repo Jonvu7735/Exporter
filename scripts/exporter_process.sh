@@ -73,13 +73,35 @@ function start_exporter() {
 
 function check_config() {
     if [[ ! -f "${CNFPATH}/${exp_name}.yaml" ]]; then
-        local base_path=$(dirname "$0")
-        local var_path="${base_path}/../var/${exp_name}.yaml"
-        if [[ -f "${var_path}" && ! -f "${CNFPATH}/${exp_name}.yaml" ]]; then
-            sudo cp -f "${var_path}" "${CNFPATH}/${exp_name}.yaml" || sudo touch "${CNFPATH}/${exp_name}.yaml"
-            sudo chown -R $USER:$USER /"${CNFPATH}/${exp_name}.yaml"
+        sudo bash -c "cat << EOF>"${CNFPATH}/${exp_name}.yaml"
+process_names:
+  - name: '{{.ExeBase}}:{{.Matches.jarname}}'
+    exe:
+    - java
+    cmdline:
+    - -classpath\s+(?P<jarname>\S*?.jar)
+
+  - name: '{{.ExeBase}}:{{.Matches.jarname}}'
+    exe:
+    - java
+    cmdline:
+    - -cp\s+\S*?(?P<jarname>[^:]*?\.jar)
+
+
+  - name: '{{.ExeBase}}:{{.Matches.config}}'
+    exe:
+    - /usr/local/scribe/bin/zingscribe
+    cmdline:
+    - (?P<config>[^/]+\.conf)
+
+EOF"
+        local revtal=$?
+        if [[ ${retval} != 0 ]]; then
+            sudo chown -R $USER:$USER "${CNFPATH}/${exp_name}.yaml"
+            echo -e $"Check config: $success"
+        else
+            echo -e $"Check config: $fail"
         fi
-        echo -e $"Check config: $success"
     fi
 }
 
