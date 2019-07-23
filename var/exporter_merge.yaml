@@ -26,3 +26,5 @@ exporters:
 - url: http://localhost:11041/metrics
 #ccu exporter
 - url: http://localhost:11042/metrics
+#gluster-fs
+- url: http://localhost:11043/metrics

@@ -98,7 +98,17 @@ process_names:
     - /etc/scribe/bin/scribed
     cmdline:
     - (?P<config>[^/]+\.conf)
-
+  - name: '{{.ExeBase}}:{{.Matches.pid}}'
+    exe:
+    - beam.smp
+    cmdline:
+    - ns_server pidfile "/opt/couchbase/var/lib/couchbase/(?P<pid>\S*?.pid)"
+	
+  - name: '{{.ExeBase}}:{{.Matches.port}}'
+    exe:
+    - memcached
+    cmdline:
+    - -p (?P<port>\S*)
 EOF"
         local revtal=$?
         if [[ ${retval} != 0 ]]; then
