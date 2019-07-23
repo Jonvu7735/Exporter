@@ -80,19 +80,16 @@ process_names:
     - java
     cmdline:
     - -classpath\s+(?P<jarname>\S*?.jar)
-
   - name: '{{.ExeBase}}:{{.Matches.jarname}}'
     exe:
     - java
     cmdline:
     - -cp\s+\S*?(?P<jarname>[^:]*?\.jar)
-
   - name: '{{.ExeBase}}:{{.Matches.config}}'
     exe:
     - /usr/local/scribe/bin/zingscribe
     cmdline:
     - (?P<config>[^/]+\.conf)
-
   - name: '{{.ExeBase}}:{{.Matches.config}}'
     exe:
     - /etc/scribe/bin/scribed
@@ -102,8 +99,7 @@ process_names:
     exe:
     - beam.smp
     cmdline:
-    - ns_server pidfile "/opt/couchbase/var/lib/couchbase/(?P<pid>\S*?.pid)"
-	
+    - ns_server pidfile \"/opt/couchbase/var/lib/couchbase/(?P<pid>\S*?.pid)\"
   - name: '{{.ExeBase}}:{{.Matches.port}}'
     exe:
     - memcached
