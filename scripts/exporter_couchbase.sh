@@ -85,8 +85,8 @@ web:
   timeout: 10s
 
 db:
-  user: "'${uservar}'"
-  password: "'${passvar}'"
+  user: "${uservar}"
+  password: "${passvar}"
   uri: http://localhost:8091
   timeout: 10s
 
