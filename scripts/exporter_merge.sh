@@ -41,7 +41,7 @@ function init_file() {
 		sudo chmod +x /etc/systemd/system/exporter_*.service
 		sudo chown -R $USER:$USER /etc/systemd/system/exporter_*.service
 		sudo systemctl daemon-reload >/dev/null 2>&1 
-		sudo systemctl enable ${exp_name}.services >/dev/null 2>&1 
+		sudo systemctl enable ${exp_name}.service >/dev/null 2>&1 
 		echo -e "Init File: $done " 
     else
         echo "Can not detect OS"
